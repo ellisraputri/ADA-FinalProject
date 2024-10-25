@@ -1,96 +1,94 @@
-import sys
 from collections import defaultdict
 
-nodeCost = []
-graph = []
-hasil = []
-hasilakhir = []
-macet = defaultdict(list)
-
-def tsp(visited, currPos, n, count, currTime, ans):
-    global hasil, hasilakhir
-
+def tsp(visited, currPos, n, count, currTime, ans, hasil, macet, nodeCost, graph):
     if count == n and graph[currPos][0]:
         totalCost = currTime + graph[currPos][0]
         if ans[0] > totalCost:
             ans[0] = totalCost
-            print(f"ans baru: {ans[0]}")
-            print()
-            hasilakhir = hasil[:]
-        return
+            print(f"New ans: {ans[0]}\n")
+            return hasil[:]  # Return the current optimal path
+        return None
+
+    optimal_path = None
 
     for i in range(n):
         if not visited[i] and graph[currPos][i]:
             visited[i] = True
             hasil.append(i)
 
-            print(f"curpos dan i: {currPos} {i}")
-            print(f"waktu skrg: {currTime}")
+            print(f"Current position: {currPos}, Next: {i}")
+            print(f"Current time: {currTime}")
 
             travelTime = graph[currPos][i]
             nextCost = currTime + travelTime + nodeCost[i]
 
+            # Check if there's a traffic delay on this route
             if (currPos, i) in macet:
                 arrivalTime = currTime + travelTime
 
                 for mulaimacet, akhirmacet, tambahanmacet in macet[(currPos, i)]:
                     tamb = 0.0
 
-                    # kasus kecil (s mulai akhir e)
+                    # Handle different traffic scenarios
                     if currTime <= mulaimacet and arrivalTime >= akhirmacet:
                         tamb = (akhirmacet - mulaimacet) * tambahanmacet
-                        print("kasus kecil")
-                    # kasus start duluan (s mulai e akhir)
-                    elif currTime < mulaimacet and mulaimacet <= arrivalTime and akhirmacet >= arrivalTime:
+                        print("Small case")
+                    elif currTime < mulaimacet <= arrivalTime <= akhirmacet:
                         tamb = (arrivalTime - mulaimacet) * tambahanmacet
-                        print("kasus start dulu")
-                    # kasus akhir duluan (mulai s akhir e)
-                    elif mulaimacet < currTime and akhirmacet > currTime and akhirmacet <= arrivalTime:
+                        print("Start first")
+                    elif mulaimacet < currTime < akhirmacet <= arrivalTime:
                         tamb = (akhirmacet - currTime) * tambahanmacet
-                        print("kasus end dulu")
-                    # kasus gede (mulai s e akhir)
+                        print("End first")
                     elif currTime >= mulaimacet and arrivalTime <= akhirmacet:
                         tamb = (arrivalTime - currTime) * tambahanmacet
-                        print("kasus gede")
+                        print("Large case")
 
                     nextCost += tamb
-                    print(f"tambahan = {tamb}")
+                    print(f"Additional time: {tamb}")
 
-            print(f"masukkin {nextCost - currTime}")
+            print(f"Adding {nextCost - currTime} to the cost")
 
-            tsp(visited, i, n, count + 1, nextCost, ans)
+            # Recur with the updated state
+            result = tsp(visited, i, n, count + 1, nextCost, ans, hasil, macet, nodeCost, graph)
+            if result:
+                optimal_path = result
 
             visited[i] = False
             hasil.pop()
-            print(f"keluarin {currTime}")
+            print(f"Backtracking to time {currTime}")
+
+    return optimal_path
 
 def main():
-    global nodeCost, graph, macet, hasil
-
     n = 4
-    nodeCost = [0,5,7,10]
+    nodeCost = [0, 15, 10, 20]
     graph = [
-        [0, 8, 12, 15],
-    [8, 0, 10, 20],
-    [12, 10, 0, 9],
-    [15, 20, 9, 0]
+        [0, 10, 15, 20],
+    [10, 0, 35, 25],
+    [15, 35, 0, 30],
+    [20, 25, 30, 0]
     ]
-    macet[(0, 1)].append((2, 12, 1.0))
-    macet[(1, 3)].append((5, 15, 0.7))
+
+    # Traffic conditions (start, end, additional cost per time unit)
+    macet = defaultdict(list)
+    macet[(0, 2)].append((5,30,1))
+    macet[(2, 3)].append((10,50,0.8))
 
     visited = [False] * n
     visited[0] = True
     ans = [float('inf')]
-    hasil.append(0)
+    hasil = [0]
 
-    tsp(visited, 0, n, 1, nodeCost[0], ans)
+    # Run the TSP and get the optimal path
+    optimal_path = tsp(visited, 0, n, 1, nodeCost[0], ans, hasil, macet, nodeCost, graph)
 
     print(f"Minimum cost: {ans[0]}")
 
-    print("Optimal path: ", end="")
-    for i in hasilakhir:
-        print(i, end=" ")
-    print()
+    if optimal_path:
+        print("Optimal path: ", end="")
+        for i in optimal_path:
+            print(i, end=" ")
+        print()
 
 if __name__ == "__main__":
     main()
