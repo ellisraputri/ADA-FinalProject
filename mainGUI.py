@@ -87,7 +87,7 @@ class PageMain:
         self.node_amount = self.nodenumField.get()
         if not self.node_amount.isnumeric() or int(self.node_amount) == 0:
             messagebox.showwarning("Warning", "Node amount must be an integer larger than 0")
-            return  # Stop further execution
+            return  
         self.node_amount = int(self.node_amount)
 
         self.ans1 = [[None for _ in range(self.node_amount)] for _ in range(self.node_amount)]
@@ -118,7 +118,6 @@ class PageMain:
         self.newWindow.title(title)
         self.newWindow.geometry("500x500")
 
-        # Store the reference properly in dictionary_window
         window_key = "1" if graph_input_true else "2"
         self.dictionary_window[window_key] = self.newWindow
 
@@ -173,55 +172,49 @@ class PageMain:
 
 
     def ok1_button_click(self):
-        print("ok1 clicked")
         try:
-            # Initialize the graph matrix
             self.graph = [[0] * self.node_amount for _ in range(self.node_amount)]
 
-            # Loop through only the upper triangle of the matrix (i < j)
             for i in range(self.node_amount):
                 for j in range(i + 1, self.node_amount):
                     entry = self.ans1[i][j]
 
-                    if entry is None:  # Skip uninitialized entries
+                    if entry is None:  
                         continue
 
-                    value = entry.get().strip()  # Get and strip the input value
-                    print(f"value: {value}")
+                    value = entry.get().strip()  
 
-                    if not value:  # Check if input is empty
+                    if not value: 
                         raise ValueError(f"Weight for edge {i}-{j} cannot be empty.")
 
-                    # Try to convert the input to a float
                     try:
                         weight = float(value)
                     except ValueError:
                         raise ValueError(f"Weight for edge {i}-{j} must be a valid number.")
 
-                    # Store the weight in both (i, j) and (j, i) directions
                     self.graph[i][j] = weight
                     self.graph[j][i] = weight
 
-            # If all inputs are valid, mark as valid and close the window
             self.graph_valid = True
             messagebox.showinfo("Success", "Graph input stored successfully!")
-            self.dictionary_window["1"].destroy()  # Close the graph input window
-            del self.dictionary_window["1"]  # Remove the reference
+            self.dictionary_window["1"].destroy()  
+            del self.dictionary_window["1"]  
 
             if "2" in self.dictionary_window:
                 self.dictionary_window["2"].focus_force()
 
-            self.check_and_submit()  # Check if both inputs are valid
+            self.check_and_submit()  
 
         except ValueError as e:
             messagebox.showwarning("Warning", str(e))
-            self.graph_valid = False  # Mark as invalid if validation fails
+            self.graph_valid = False  
+            self.dictionary_window["1"].focus_force()
+
 
 
 
     def ok2_button_click(self):
         try:
-            # Validate and store node cost input
             self.nodecost = [0] * self.node_amount
             for i in range(1, self.node_amount):
                 value = self.ans2[i].get().strip()
@@ -230,48 +223,38 @@ class PageMain:
 
                 self.nodecost[i] = float(value)
 
-            # If validation passes, mark node cost as valid
             self.nodecost_valid = True
             messagebox.showinfo("Success", "Node cost input stored successfully!")
-            self.dictionary_window["2"].destroy()  # Close the node cost window
-            del self.dictionary_window["2"]  # Ensure the reference is removed
+            self.dictionary_window["2"].destroy()
+            del self.dictionary_window["2"]  
             if "1" in self.dictionary_window:
                 self.dictionary_window["1"].focus_force()
 
-            self.check_and_submit()  # Check if both windows are valid
+            self.check_and_submit()  
 
         except ValueError as e:
             messagebox.showwarning("Warning", str(e))
-            self.nodecost_valid = False  # Mark as invalid if exception occurs
+            self.nodecost_valid = False  
+            self.dictionary_window["2"].focus_force()
 
 
     def check_and_submit(self):
-        if self.graph_valid: 
-            self.prepareGen.set_graph(self.graph)
-        
-        if self.nodecost_valid:
-            self.prepareGen.set_nodecost(self.nodecost)
-
-        """Check if both graph and node cost inputs are valid, then proceed."""
         if self.graph_manual and not self.graph_valid:
-            return  # Don't proceed if graph input is required but invalid
+            return  
 
         if self.nodecost_manual and not self.nodecost_valid:
-            return  # Don't proceed if node cost input is required but invalid
+            return 
 
-        # If both are valid, proceed to submission
         self.submit2()
 
 
 
     def submit2(self):
-        # print(self.nodecost)
-        # print(self.graph)
-        # print(self.algo_chosen)
-        # print(self.speed_chosen)
-        # print(self.node_amount)
-        # print(self.graph_manual)
-        # print(self.nodecost_manual)
+        self.prepareGen.set_graph(self.graph)
+        self.prepareGen.set_nodecost(self.nodecost)
+        self.prepareGen.set_algochosen(self.algo_chosen)
+        self.prepareGen.set_nodeamount(self.node_amount)
+        self.prepareGen.set_speedchosen(self.speed_chosen)
         self.prepareGen.printing()
 
 
