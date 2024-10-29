@@ -3,21 +3,48 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from collections import defaultdict
 
-def generate_complete_graph(num_nodes,randomize, graphInput=None, nodeCostInput=None, weight_range=(1, 100)):
+speed=0.5
+
+def generate_complete_graph(num_nodes, graphInput=None, nodeCostInput=None, weight_range=(1, 100)):
     G = nx.complete_graph(num_nodes)
 
-    if(randomize):
+    if(graphInput==None):
         for u, v in G.edges():
             G.edges[u, v]['weight'] = random.randint(*weight_range) 
-        for u in G.nodes():
-            G.nodes[u]['nodeCost']= random.randint(*weight_range) 
     else:
         for u, v in G.edges():
             G.edges[u, v]['weight'] =graphInput[u][v]
+    
+    if(nodeCostInput==None):
+        for u in G.nodes():
+            G.nodes[u]['nodeCost']= random.randint(*weight_range) 
+    else:
         for u in G.nodes():
             G.nodes[u]['nodeCost'] = nodeCostInput[u]
 
     return G
+
+
+def generate_congestion(num_nodes, congestion_input=None, weight_range=(1, 100)):
+    macet = defaultdict(list)
+
+    if not congestion_input: 
+        num_pairs = random.randint(1, num_nodes * (num_nodes - 1))  
+
+        for _ in range(num_pairs):
+            i = random.randint(0, num_nodes - 1)
+            j = random.randint(0, num_nodes - 1)
+
+            if i != j:  
+                a = random.randint(*weight_range)  
+                b = random.randint(a, weight_range[1])  
+                percent = round(random.uniform(0.1, 1.0), 2)  
+
+                macet[(i, j)].append((a, b, percent))
+    else:
+        macet = congestion_input  
+
+    return macet
 
 
 
@@ -42,7 +69,7 @@ def plot_graph_step(G, tour, current_node, pos):
     offset_pos = {node: (x, y - 0.07) for node, (x, y) in pos.items()}  # Adjust position
     nx.draw_networkx_labels(G, offset_pos, labels=node_cost_labels, font_size=8, font_color='black')
 
-    plt.pause(0.5)  # Pause to visualize the step
+    plt.pause(speed)  # Pause to visualize the step
 
 
 def plot_final_path(G, pos, optimal_path):
@@ -70,7 +97,7 @@ def plot_final_path(G, pos, optimal_path):
     plt.show()
 
 
-def backtrack_tsp(visited, currPos, n, count, currTime, ans, hasil, macet, G, posGUI):
+def backtrack_tsp(visited, currPos, n, count, currTime, ans, hasil, macet, G, posGUI, sc):
     # Base case: If all nodes are visited and we are back to the start (node 0)
     if count == n - 1 and G.has_edge(currPos, 0):
         totalCost = currTime + G[currPos][0]['weight']
@@ -111,15 +138,17 @@ def backtrack_tsp(visited, currPos, n, count, currTime, ans, hasil, macet, G, po
 
                     nextCost += tamb
                     print(f"Additional time: {tamb}")
+                    sc.add_log(f"Additional time: {tamb}")
 
             # Check for traffic delays (same logic as before)
             print(f"Visiting node {i} from {currPos}. Cost: {nextCost}")
+            sc.add_log(f"Visiting node {i} from {currPos}. Cost: {nextCost}")
 
             # Update the plot immediately after visiting a node
             plot_graph_step(G, hasil, currPos, posGUI)  # Show the current path
 
             # Recur for the next node
-            result = backtrack_tsp(visited, i, n, count + 1, nextCost, ans, hasil, macet, G, posGUI)
+            result = backtrack_tsp(visited, i, n, count + 1, nextCost, ans, hasil, macet, G, posGUI,sc)
             if result:
                 optimal_path = result
 
@@ -135,13 +164,9 @@ def backtrack_tsp(visited, currPos, n, count, currTime, ans, hasil, macet, G, po
 
 
 
-def backtrack(G, n):
+def backtrack(G, n, macet, sc):
     pos = nx.spring_layout(G)  # Generate layout only once
     plt.ion()  # Interactive mode to update plots in real-time
-    
-    macet = defaultdict(list)
-    macet[(1,3)].append((5, 70,3))
-    macet[(3,1)].append((5,70,3))
 
     visited = [False] * n
     visited[0] = True
@@ -149,12 +174,16 @@ def backtrack(G, n):
     hasil = [0]
 
     # Start the TSP solution with backtracking
-    optimal_path = backtrack_tsp(visited, 0, n, 0, 0, ans, hasil, macet, G, pos)
+    optimal_path = backtrack_tsp(visited, 0, n, 0, 0, ans, hasil, macet, G, pos, sc)
     optimal_path.append(0)
 
     print(f"Minimum cost: {ans[0]}")
+    sc.add_log("\n")
+    sc.add_log(f"Minimum cost: {ans[0]}")
     if optimal_path:
-        print("Optimal path: ", ' -> '.join(map(str, optimal_path)))
+        x = "Optimal path: " + ' -> '.join(map(str, optimal_path))
+        print(x)
+        sc.add_log(x)
     plot_final_path(G, pos, optimal_path)
 
     plt.ioff()  # Turn off interactive mode
@@ -162,13 +191,3 @@ def backtrack(G, n):
 
 
 
-if __name__ == '__main__':
-    nodeCost = [0, 15, 10, 20]
-    graph = [
-        [0, 10, 15, 20.0],
-    [10, 0, 35, 25],
-    [15, 35, 0, 30],
-    [20, 25, 30, 0]
-    ]
-    G = generate_complete_graph(4, False, graph, nodeCost)
-    backtrack(G, 4)

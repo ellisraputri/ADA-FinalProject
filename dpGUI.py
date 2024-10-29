@@ -4,21 +4,48 @@ import matplotlib.pyplot as plt
 import sys
 from collections import defaultdict
 
-def generate_complete_graph(num_nodes,randomize, graphInput=None, nodeCostInput=None, weight_range=(1, 100)):
+speed=0.5
+
+def generate_complete_graph(num_nodes, graphInput=None, nodeCostInput=None, weight_range=(1, 100)):
     G = nx.complete_graph(num_nodes)
 
-    if(randomize):
+    if(graphInput==None):
         for u, v in G.edges():
             G.edges[u, v]['weight'] = random.randint(*weight_range) 
-        for u in G.nodes():
-            G.nodes[u]['nodeCost']= random.randint(*weight_range) 
     else:
         for u, v in G.edges():
             G.edges[u, v]['weight'] =graphInput[u][v]
+    
+    if(nodeCostInput==None):
+        for u in G.nodes():
+            G.nodes[u]['nodeCost']= random.randint(*weight_range) 
+    else:
         for u in G.nodes():
             G.nodes[u]['nodeCost'] = nodeCostInput[u]
 
     return G
+
+
+def generate_congestion(num_nodes, congestion_input=None, weight_range=(1, 100)):
+    macet = defaultdict(list)
+
+    if not congestion_input: 
+        num_pairs = random.randint(1, num_nodes * (num_nodes - 1))  
+
+        for _ in range(num_pairs):
+            i = random.randint(0, num_nodes - 1)
+            j = random.randint(0, num_nodes - 1)
+
+            if i != j:  
+                a = random.randint(*weight_range)  
+                b = random.randint(a, weight_range[1])  
+                percent = round(random.uniform(0.1, 1.0), 2)  
+
+                macet[(i, j)].append((a, b, percent))
+    else:
+        macet = congestion_input  
+
+    return macet
 
 
 
@@ -39,7 +66,7 @@ def plot_graph_step(G, pos, visited_edges, current_node):
     offset_pos = {node: (x, y - 0.07) for node, (x, y) in pos.items()}
     nx.draw_networkx_labels(G, offset_pos, labels=node_cost_labels, font_size=8, font_color='black')
 
-    plt.pause(0.5)  # Pause to visualize the step
+    plt.pause(speed)  # Pause to visualize the step
 
 
 def plot_final_path(G, pos, optimal_path):
@@ -112,11 +139,16 @@ def dp_tsp(n, current, mask, dp, link, currTime, G, macet, posGUI, visited_edges
             result = sub
             link[mask][current]=i
             best_next_node = i  # Track the optimal next node
+        
 
     # Add the optimal edge to the visited edges
     if best_next_node is not None:
         visited_edges.append((current, best_next_node))
         plot_graph_step(G, posGUI, visited_edges, current)  # Plot only optimal edges
+    
+    if not plt.fignum_exists(1):
+        print("Window closed. Exiting...")
+        exit()  # Exit if the window is closed
 
     dp[mask][current] = result
     return result
@@ -143,12 +175,9 @@ def getpath(link):
 
 
 
-def dynamic_programming(G, n):
+def dynamic_programming(G, n, macet):
     pos = nx.spring_layout(G) 
     plt.ion()
-    macet = defaultdict(list)
-    macet[(1, 3)].append((5, 70, 3))
-    macet[(3, 1)].append((5, 70, 3))
 
     dp = [[-1] * n for _ in range(1 << n)]
     link = [[0] * n for _ in range(1 << n)]

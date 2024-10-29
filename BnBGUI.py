@@ -4,21 +4,50 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 from math import inf
 
-def generate_complete_graph(num_nodes, randomize, graphInput=None, nodeCostInput=None, weight_range=(1, 100)):
+speed=0.5
+
+def generate_complete_graph(num_nodes, graphInput=None, nodeCostInput=None, weight_range=(1, 100)):
     G = nx.complete_graph(num_nodes)
 
-    if randomize:
+    if(graphInput==None):
         for u, v in G.edges():
-            G.edges[u, v]['weight'] = random.randint(*weight_range)
-        for u in G.nodes():
-            G.nodes[u]['nodeCost'] = random.randint(*weight_range)
+            G.edges[u, v]['weight'] = random.randint(*weight_range) 
     else:
         for u, v in G.edges():
-            G.edges[u, v]['weight'] = graphInput[u][v]
+            G.edges[u, v]['weight'] =graphInput[u][v]
+    
+    if(nodeCostInput==None):
+        for u in G.nodes():
+            G.nodes[u]['nodeCost']= random.randint(*weight_range) 
+    else:
         for u in G.nodes():
             G.nodes[u]['nodeCost'] = nodeCostInput[u]
 
     return G
+
+
+def generate_congestion(num_nodes, congestion_input=None, weight_range=(1, 100)):
+    macet = defaultdict(list)
+
+    if not congestion_input: 
+        num_pairs = random.randint(1, num_nodes * (num_nodes - 1))  
+
+        for _ in range(num_pairs):
+            i = random.randint(0, num_nodes - 1)
+            j = random.randint(0, num_nodes - 1)
+
+            if i != j:  
+                a = random.randint(*weight_range)  
+                b = random.randint(a, weight_range[1])  
+                percent = round(random.uniform(0.1, 1.0), 2)  
+
+                macet[(i, j)].append((a, b, percent))
+    else:
+        macet = congestion_input  
+
+    return macet
+
+
 
 def plot_graph_step(G, tour, current_node, pos):
     plt.clf()
@@ -41,7 +70,7 @@ def plot_graph_step(G, tour, current_node, pos):
     offset_pos = {node: (x, y - 0.07) for node, (x, y) in pos.items()}  # Adjust position
     nx.draw_networkx_labels(G, offset_pos, labels=node_cost_labels, font_size=8, font_color='black')
 
-    plt.pause(0.5)  # Pause to visualize the step
+    plt.pause(speed)  # Pause to visualize the step
 
 
 
@@ -138,26 +167,26 @@ def BNBrec(G, curr_bound, curr_weight, lvl, curr_path, N, visited, macet, res, p
             if curr_bound + curr_weight < res[0]:  # Use res[0]
                 curr_path[lvl] = i
                 visited[i] = True
-                curr_weight += nodeCost[i]
+                curr_weight += G.nodes[i]['nodeCost']
                 plot_graph_step(G, curr_path, i, posGUI)
                 BNBrec(G, curr_bound, curr_weight, lvl + 1, curr_path, N, visited, macet, res, path, posGUI)
 
+            if not plt.fignum_exists(1):
+                print("Window closed. Exiting...")
+                exit()  # Exit if the window is closed
+                
             curr_weight = temp_weight
             curr_bound = temp_bound
             visited[i] = False
 
 
 
-def bnb(G, N):
+def bnb(G, N, macet):
     pos = nx.spring_layout(G)  # Generate layout only once
     plt.ion()  # Interactive mode to update plots in real-time
 
     curr_path = [-1] * (N + 1)
     curr_bound = 0
-
-    macet = defaultdict(list)
-    macet[(0, 1)].append((2, 5, 1.0))
-    macet[(0, 1)].append((7, 12, 0.5))
 
     path = [-1] * (N + 1)
 
@@ -184,14 +213,3 @@ def bnb(G, N):
     plt.show()  # Show the final graph after calculations
 
 
-
-if __name__ == '__main__':
-    nodeCost = [0, 5, 6]
-    graph = [
-        [0, 10, 15],
-        [10, 0, 20],
-        [15, 20, 0]
-    ]
-
-    G = generate_complete_graph(3, False, graph, nodeCost)
-    bnb(G, 3)
