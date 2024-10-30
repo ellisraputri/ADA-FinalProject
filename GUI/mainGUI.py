@@ -13,7 +13,6 @@ class PageMain:
 
         self.prepareGen = prepareGenerator()
         
-
         self.title = tk.Label(self.root, text="TSP Visualizer", font='SegoeUI 32 bold')
         self.title.pack(padx=400, pady=5)
 
@@ -28,6 +27,12 @@ class PageMain:
         self.dropdown.place(x=20, y=150)
         menu = self.root.nametowidget(self.dropdown.menuname)
         menu.configure(font="SegoeUI 14")
+
+        self.summaryTitle = tk.Label(self.root, text="Summary", font='SegoeUI 20 bold')
+        self.summaryTitle.place(x=800, y=100)
+
+        self.outputTitle = tk.Label(self.root, text="Output", font='SegoeUI 20 bold')
+        self.outputTitle.place(x=800, y=460)
 
         self.nodenum = tk.Label(self.root, text="Node amount:", font='SegoeUI 20 bold')
         self.nodenum.place(x=20, y=220)

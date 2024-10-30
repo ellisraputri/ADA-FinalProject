@@ -2,11 +2,11 @@ import tkinter as tk
 from scrollableCanvas import ScrollableCanvas
 
 class ScrollCanvas():
-    def __init__(self, root):
+    def __init__(self, root, x_input, y_input):
         self.root = root
         self.scroll_canvas = ScrollableCanvas(self.root)
         self.scroll_canvas.pack(fill="both", expand=True)
-        self.scroll_canvas.place(x=800, y=200)
+        self.scroll_canvas.place(x=x_input, y=y_input)
     
 
     def add_log(self, message):

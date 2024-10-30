@@ -18,7 +18,10 @@ def generate_complete_graph(num_nodes, graphInput=None, nodeCostInput=None, weig
     
     if(nodeCostInput==None):
         for u in G.nodes():
-            G.nodes[u]['nodeCost']= random.randint(*weight_range) 
+            if u == 0:
+                G.nodes[u]['nodeCost'] = 0
+            elif 'nodeCost' not in G.nodes[u]:  
+                G.nodes[u]['nodeCost'] = random.randint(*weight_range) 
     else:
         for u in G.nodes():
             G.nodes[u]['nodeCost'] = nodeCostInput[u]
@@ -26,8 +29,9 @@ def generate_complete_graph(num_nodes, graphInput=None, nodeCostInput=None, weig
     return G
 
 
-def generate_congestion(num_nodes, congestion_input=None, weight_range=(1, 100)):
+def generate_congestion(num_nodes, congestion_input=None):
     macet = defaultdict(list)
+    weight_range=(1, num_nodes*100)
 
     if not congestion_input: 
         num_pairs = random.randint(1, num_nodes * (num_nodes - 1))  
@@ -96,7 +100,7 @@ def plot_final_path(G, pos, optimal_path):
 
 
 
-def dp_tsp(n, current, mask, dp, link, currTime, G, macet, posGUI, visited_edges):
+def dp_tsp(n, current, mask, dp, link, currTime, G, macet, posGUI, visited_edges, sc):
     if mask == (1 << n) - 1:
         return G[current][0]['weight']
 
@@ -114,7 +118,7 @@ def dp_tsp(n, current, mask, dp, link, currTime, G, macet, posGUI, visited_edges
         travelTime = G[current][i]['weight']
         sub = (
             dp_tsp(n, i, mask | val, dp, link, currTime + travelTime + G.nodes[i]['nodeCost'],
-                   G, macet, posGUI, visited_edges) + travelTime + G.nodes[i]['nodeCost']
+                   G, macet, posGUI, visited_edges, sc) + travelTime + G.nodes[i]['nodeCost']
         )
 
         arrivalTime = currTime + travelTime
@@ -133,12 +137,15 @@ def dp_tsp(n, current, mask, dp, link, currTime, G, macet, posGUI, visited_edges
                     tamb = (arrivalTime - currTime) * tambahanmacet
 
                 sub += tamb
+                sc.add_log(f"Additional time: {tamb}")
 
         # Check if the current path is the best so far
         if sub < result:
             result = sub
             link[mask][current]=i
             best_next_node = i  # Track the optimal next node
+        
+        sc.add_log(f"Visiting node {i} from {current}. Cost: {sub}")
         
 
     # Add the optimal edge to the visited edges
@@ -175,7 +182,7 @@ def getpath(link):
 
 
 
-def dynamic_programming(G, n, macet):
+def dynamic_programming(G, n, macet, sc):
     pos = nx.spring_layout(G) 
     plt.ion()
 
@@ -184,11 +191,14 @@ def dynamic_programming(G, n, macet):
 
     visited_edges = []  # Track visited edges
 
-    res = dp_tsp(n, 0, 1, dp, link, 0, G, macet, pos, visited_edges)
+    res = dp_tsp(n, 0, 1, dp, link, 0, G, macet, pos, visited_edges, sc)
 
     optimal_path = getpath(link)
     print(f"result {res}")
+    sc.add_log(f"\nMinimum cost: {res}")
     print("Path:", " ".join(map(str, optimal_path)))
+    x = "Optimal path: " + ' -> '.join(map(str, optimal_path))
+    sc.add_log(x)
 
     plot_final_path(G, pos, optimal_path)  # Final plot
 
@@ -198,13 +208,3 @@ def dynamic_programming(G, n, macet):
 
 
 
-if __name__ == '__main__':
-    nodeCost = [0, 15, 10, 20]
-    graph = [
-        [0, 10, 15, 20],
-    [10, 0, 35, 25],
-    [15, 35, 0, 30],
-    [20, 25, 30, 0]
-    ]
-    G = generate_complete_graph(4, False, graph, nodeCost)
-    dynamic_programming(G, 4)

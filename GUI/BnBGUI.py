@@ -18,7 +18,10 @@ def generate_complete_graph(num_nodes, graphInput=None, nodeCostInput=None, weig
     
     if(nodeCostInput==None):
         for u in G.nodes():
-            G.nodes[u]['nodeCost']= random.randint(*weight_range) 
+            if u == 0:
+                G.nodes[u]['nodeCost'] = 0
+            elif 'nodeCost' not in G.nodes[u]:  
+                G.nodes[u]['nodeCost'] = random.randint(*weight_range)
     else:
         for u in G.nodes():
             G.nodes[u]['nodeCost'] = nodeCostInput[u]
@@ -26,8 +29,9 @@ def generate_complete_graph(num_nodes, graphInput=None, nodeCostInput=None, weig
     return G
 
 
-def generate_congestion(num_nodes, congestion_input=None, weight_range=(1, 100)):
+def generate_congestion(num_nodes, congestion_input=None):
     macet = defaultdict(list)
+    weight_range=(1, num_nodes*100)
 
     if not congestion_input: 
         num_pairs = random.randint(1, num_nodes * (num_nodes - 1))  
@@ -125,7 +129,7 @@ def copyToFinal(curr_path, N, path):
     path[N] = curr_path[0]
 
 
-def BNBrec(G, curr_bound, curr_weight, lvl, curr_path, N, visited, macet, res, path, posGUI):
+def BNBrec(G, curr_bound, curr_weight, lvl, curr_path, N, visited, macet, res, path, posGUI, sc):
     if lvl == N:
         if G[curr_path[lvl - 1]][curr_path[0]]['weight'] != 0:
             curr_res = curr_weight + G[curr_path[lvl - 1]][curr_path[0]]['weight']
@@ -156,8 +160,10 @@ def BNBrec(G, curr_bound, curr_weight, lvl, curr_path, N, visited, macet, res, p
                         tamb = (end_time - curr_weight) * tambahanmacet
 
                     nextCost += tamb
+                    sc.add_log(f"Additional time: {tamb}")
 
             curr_weight += G[curr_path[lvl - 1]][i]['weight'] + nextCost
+            sc.add_log(f"Visiting node {i} from {curr_path[lvl-1]}. Cost: {nextCost}")
 
             if lvl == 1:
                 curr_bound -= (firstMin(G, curr_path[lvl - 1], N) + firstMin(G, i, N)) / 2
@@ -169,7 +175,7 @@ def BNBrec(G, curr_bound, curr_weight, lvl, curr_path, N, visited, macet, res, p
                 visited[i] = True
                 curr_weight += G.nodes[i]['nodeCost']
                 plot_graph_step(G, curr_path, i, posGUI)
-                BNBrec(G, curr_bound, curr_weight, lvl + 1, curr_path, N, visited, macet, res, path, posGUI)
+                BNBrec(G, curr_bound, curr_weight, lvl + 1, curr_path, N, visited, macet, res, path, posGUI,sc)
 
             if not plt.fignum_exists(1):
                 print("Window closed. Exiting...")
@@ -181,7 +187,7 @@ def BNBrec(G, curr_bound, curr_weight, lvl, curr_path, N, visited, macet, res, p
 
 
 
-def bnb(G, N, macet):
+def bnb(G, N, macet,sc):
     pos = nx.spring_layout(G)  # Generate layout only once
     plt.ion()  # Interactive mode to update plots in real-time
 
@@ -200,13 +206,18 @@ def bnb(G, N, macet):
     curr_path[0] = 0
     res = [inf]  # Use a list to store the result
 
-    BNBrec(G, curr_bound, 0, 1, curr_path, N, visited, macet, res, path, pos)
+    BNBrec(G, curr_bound, 0, 1, curr_path, N, visited, macet, res, path, pos,sc)
 
     if res[0] == inf:
         print("No valid path found.")
     else:
         print(f"Minimum cost: {res[0]}")
         print("Optimal path: ", ' -> '.join(map(str, path)))
+
+        sc.add_log(f"\nMinimum cost: {res[0]}")
+        x = "Optimal path: " + ' -> '.join(map(str, path))
+        sc.add_log(x)
+        
 
     plot_final_path(G, pos, path)
     plt.ioff()  # Turn off interactive mode

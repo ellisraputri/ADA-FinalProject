@@ -17,7 +17,11 @@ def generate_complete_graph(num_nodes, graphInput=None, nodeCostInput=None, weig
     
     if(nodeCostInput==None):
         for u in G.nodes():
-            G.nodes[u]['nodeCost']= random.randint(*weight_range) 
+            if u == 0:
+                G.nodes[u]['nodeCost'] = 0
+            elif 'nodeCost' not in G.nodes[u]:  
+                G.nodes[u]['nodeCost'] = random.randint(*weight_range)
+ 
     else:
         for u in G.nodes():
             G.nodes[u]['nodeCost'] = nodeCostInput[u]
@@ -25,8 +29,9 @@ def generate_complete_graph(num_nodes, graphInput=None, nodeCostInput=None, weig
     return G
 
 
-def generate_congestion(num_nodes, congestion_input=None, weight_range=(1, 100)):
+def generate_congestion(num_nodes, congestion_input=None):
     macet = defaultdict(list)
+    weight_range=(1, num_nodes*100)
 
     if not congestion_input: 
         num_pairs = random.randint(1, num_nodes * (num_nodes - 1))  
@@ -178,8 +183,7 @@ def backtrack(G, n, macet, sc):
     optimal_path.append(0)
 
     print(f"Minimum cost: {ans[0]}")
-    sc.add_log("\n")
-    sc.add_log(f"Minimum cost: {ans[0]}")
+    sc.add_log(f"\nMinimum cost: {ans[0]}")
     if optimal_path:
         x = "Optimal path: " + ' -> '.join(map(str, optimal_path))
         print(x)
