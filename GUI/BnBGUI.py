@@ -56,7 +56,6 @@ def generate_congestion(num_nodes, congestion_input=None):
 def plot_graph_step(G, tour, current_node, pos):
     plt.clf()
 
-    # Draw only the nodes initially
     nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=1000)
     nx.draw_networkx_nodes(G, pos, nodelist=[current_node], node_color='springgreen', node_size=700)
 
@@ -65,38 +64,31 @@ def plot_graph_step(G, tour, current_node, pos):
         nx.draw_networkx_edges(G, pos, edgelist=path_edges, edge_color='red', width=2)
 
 
-    # Draw edge weights as labels
     edge_labels = nx.get_edge_attributes(G, 'weight')
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
-    # Display node costs as labels below the nodes
     node_cost_labels = {node: f"{G.nodes[node].get('nodeCost', '')}" for node in G.nodes}
     offset_pos = {node: (x, y - 0.07) for node, (x, y) in pos.items()}  # Adjust position
     nx.draw_networkx_labels(G, offset_pos, labels=node_cost_labels, font_size=8, font_color='black')
 
-    plt.pause(speed)  # Pause to visualize the step
+    plt.pause(speed)  
 
 
 
 def plot_final_path(G, pos, optimal_path):
     plt.clf()
 
-    # Draw the graph with nodes
     nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=1000)
 
-    # Highlight the nodes on the optimal path
     nx.draw_networkx_nodes(G, pos, nodelist=optimal_path, node_color='springgreen', node_size=700)
 
-    # Create edges from the optimal path
     if -1 not in optimal_path:
         optimal_edges = list(zip(optimal_path, optimal_path[1:]))
         nx.draw_networkx_edges(G, pos, edgelist=optimal_edges, edge_color='red', width=2)
 
-    # Draw edge weights as labels
     edge_labels = nx.get_edge_attributes(G, 'weight')
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
-    # Display node costs as labels below the nodes
     node_cost_labels = {node: f"{G.nodes[node].get('nodeCost', '')}" for node in G.nodes}
     offset_pos = {node: (x, y - 0.07) for node, (x, y) in pos.items()}
     nx.draw_networkx_labels(G, offset_pos, labels=node_cost_labels, font_size=8, font_color='black')
@@ -170,7 +162,7 @@ def BNBrec(G, curr_bound, curr_weight, lvl, curr_path, N, visited, macet, res, p
             else:
                 curr_bound -= (secondMin(G, curr_path[lvl - 1], N) + firstMin(G, i, N)) / 2
 
-            if curr_bound + curr_weight < res[0]:  # Use res[0]
+            if curr_bound + curr_weight < res[0]:  
                 curr_path[lvl] = i
                 visited[i] = True
                 curr_weight += G.nodes[i]['nodeCost']
@@ -179,7 +171,7 @@ def BNBrec(G, curr_bound, curr_weight, lvl, curr_path, N, visited, macet, res, p
 
             if not plt.fignum_exists(1):
                 print("Window closed. Exiting...")
-                exit()  # Exit if the window is closed
+                exit()  
                 
             curr_weight = temp_weight
             curr_bound = temp_bound
@@ -188,8 +180,8 @@ def BNBrec(G, curr_bound, curr_weight, lvl, curr_path, N, visited, macet, res, p
 
 
 def bnb(G, N, macet,sc):
-    pos = nx.spring_layout(G)  # Generate layout only once
-    plt.ion()  # Interactive mode to update plots in real-time
+    pos = nx.spring_layout(G)  
+    plt.ion() 
 
     curr_path = [-1] * (N + 1)
     curr_bound = 0
@@ -199,12 +191,12 @@ def bnb(G, N, macet,sc):
     for i in range(N):
         curr_bound += (firstMin(G, i, N) + secondMin(G, i, N))
 
-    curr_bound = (curr_bound + 1) // 2  # Ensure proper rounding
+    curr_bound = (curr_bound + 1) // 2  
 
     visited = [False] * N
     visited[0] = True
     curr_path[0] = 0
-    res = [inf]  # Use a list to store the result
+    res = [inf] 
 
     BNBrec(G, curr_bound, 0, 1, curr_path, N, visited, macet, res, path, pos,sc)
 
@@ -220,7 +212,7 @@ def bnb(G, N, macet,sc):
         
 
     plot_final_path(G, pos, path)
-    plt.ioff()  # Turn off interactive mode
-    plt.show()  # Show the final graph after calculations
+    plt.ioff()  
+    plt.show()  
 
 

@@ -56,45 +56,35 @@ def generate_congestion(num_nodes, congestion_input=None):
 def plot_graph_step(G, tour, current_node, pos):
     plt.clf()
 
-    # Draw only the nodes initially
     nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=1000)
     nx.draw_networkx_nodes(G, pos, nodelist=[current_node], node_color='springgreen', node_size=700)
 
-    # If there is a path, show all edges drawn so far
     if len(tour) > 1:
         path_edges = list(zip(tour, tour[1:]))
         nx.draw_networkx_edges(G, pos, edgelist=path_edges, edge_color='red', width=2)
 
-    # Draw edge weights as labels
     edge_labels = nx.get_edge_attributes(G, 'weight')
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
-    # Display node costs as labels below the nodes
     node_cost_labels = {node: f"{G.nodes[node].get('nodeCost', '')}" for node in G.nodes}
-    offset_pos = {node: (x, y - 0.07) for node, (x, y) in pos.items()}  # Adjust position
+    offset_pos = {node: (x, y - 0.07) for node, (x, y) in pos.items()}  
     nx.draw_networkx_labels(G, offset_pos, labels=node_cost_labels, font_size=8, font_color='black')
 
-    plt.pause(speed)  # Pause to visualize the step
+    plt.pause(speed) 
 
 
 def plot_final_path(G, pos, optimal_path):
     plt.clf()
 
-    # Draw the graph with nodes
     nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=1000)
-
-    # Highlight the nodes on the optimal path
     nx.draw_networkx_nodes(G, pos, nodelist=optimal_path, node_color='springgreen', node_size=700)
 
-    # Create edges from the optimal path
     optimal_edges = list(zip(optimal_path, optimal_path[1:]))
     nx.draw_networkx_edges(G, pos, edgelist=optimal_edges, edge_color='red', width=2)
 
-    # Draw edge weights as labels
     edge_labels = nx.get_edge_attributes(G, 'weight')
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
-    # Display node costs as labels below the nodes
     node_cost_labels = {node: f"{G.nodes[node].get('nodeCost', '')}" for node in G.nodes}
     offset_pos = {node: (x, y - 0.07) for node, (x, y) in pos.items()}
     nx.draw_networkx_labels(G, offset_pos, labels=node_cost_labels, font_size=8, font_color='black')
@@ -103,12 +93,11 @@ def plot_final_path(G, pos, optimal_path):
 
 
 def backtrack_tsp(visited, currPos, n, count, currTime, ans, hasil, macet, G, posGUI, sc):
-    # Base case: If all nodes are visited and we are back to the start (node 0)
     if count == n - 1 and G.has_edge(currPos, 0):
         totalCost = currTime + G[currPos][0]['weight']
         if ans[0] > totalCost:
             ans[0] = totalCost
-            return hasil[:]  # Return a copy of the optimal path
+            return hasil[:]  
         return None
 
     optimal_path = None
@@ -127,7 +116,6 @@ def backtrack_tsp(visited, currPos, n, count, currTime, ans, hasil, macet, G, po
                 for mulaimacet, akhirmacet, tambahanmacet in macet[(currPos, i)]:
                     tamb = 0.0
 
-                    # Handle different traffic scenarios
                     if currTime <= mulaimacet and arrivalTime >= akhirmacet:
                         tamb = (akhirmacet - mulaimacet) * tambahanmacet
                         print("Small case")
@@ -145,40 +133,35 @@ def backtrack_tsp(visited, currPos, n, count, currTime, ans, hasil, macet, G, po
                     print(f"Additional time: {tamb}")
                     sc.add_log(f"Additional time: {tamb}")
 
-            # Check for traffic delays (same logic as before)
             print(f"Visiting node {i} from {currPos}. Cost: {nextCost}")
             sc.add_log(f"Visiting node {i} from {currPos}. Cost: {nextCost}")
 
-            # Update the plot immediately after visiting a node
             plot_graph_step(G, hasil, currPos, posGUI)  # Show the current path
 
-            # Recur for the next node
             result = backtrack_tsp(visited, i, n, count + 1, nextCost, ans, hasil, macet, G, posGUI,sc)
             if result:
                 optimal_path = result
 
-            visited[i] = False  # Backtrack
-            hasil.pop()  # Remove the last node
+            visited[i] = False  
+            hasil.pop()  
 
-            # Check if the figure is still open
             if not plt.fignum_exists(1):
                 print("Window closed. Exiting...")
-                exit()  # Exit if the window is closed
+                exit()  
 
     return optimal_path
 
 
 
 def backtrack(G, n, macet, sc):
-    pos = nx.spring_layout(G)  # Generate layout only once
-    plt.ion()  # Interactive mode to update plots in real-time
+    pos = nx.spring_layout(G)  
+    plt.ion()  
 
     visited = [False] * n
     visited[0] = True
     ans = [float('inf')]
     hasil = [0]
 
-    # Start the TSP solution with backtracking
     optimal_path = backtrack_tsp(visited, 0, n, 0, 0, ans, hasil, macet, G, pos, sc)
     optimal_path.append(0)
 
@@ -190,8 +173,8 @@ def backtrack(G, n, macet, sc):
         sc.add_log(x)
     plot_final_path(G, pos, optimal_path)
 
-    plt.ioff()  # Turn off interactive mode
-    plt.show()  # Show the final graph after calculations
+    plt.ioff()  
+    plt.show()  
 
 
 

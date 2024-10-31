@@ -56,41 +56,32 @@ def generate_congestion(num_nodes, congestion_input=None):
 def plot_graph_step(G, pos, visited_edges, current_node):
     plt.clf()
 
-    # Draw the nodes and the accumulated optimal path edges
     nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=1000)
     nx.draw_networkx_nodes(G, pos, nodelist=[current_node], node_color='springgreen', node_size=700)
     nx.draw_networkx_edges(G, pos, edgelist=visited_edges, edge_color='red', width=2)
 
-    # Draw edge weights as labels
     edge_labels = nx.get_edge_attributes(G, 'weight')
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
-    # Display node costs as labels below the nodes
     node_cost_labels = {node: f"{G.nodes[node].get('nodeCost', '')}" for node in G.nodes}
     offset_pos = {node: (x, y - 0.07) for node, (x, y) in pos.items()}
     nx.draw_networkx_labels(G, offset_pos, labels=node_cost_labels, font_size=8, font_color='black')
 
-    plt.pause(speed)  # Pause to visualize the step
+    plt.pause(speed)  
 
 
 def plot_final_path(G, pos, optimal_path):
     plt.clf()
 
-    # Draw the graph with nodes
     nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=1000)
-
-    # Highlight the nodes on the optimal path
     nx.draw_networkx_nodes(G, pos, nodelist=optimal_path, node_color='springgreen', node_size=700)
 
-    # Create edges from the optimal path
     optimal_edges = list(zip(optimal_path, optimal_path[1:]))
     nx.draw_networkx_edges(G, pos, edgelist=optimal_edges, edge_color='red', width=2)
 
-    # Draw edge weights as labels
     edge_labels = nx.get_edge_attributes(G, 'weight')
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
-    # Display node costs as labels below the nodes
     node_cost_labels = {node: f"{G.nodes[node].get('nodeCost', '')}" for node in G.nodes}
     offset_pos = {node: (x, y - 0.07) for node, (x, y) in pos.items()}
     nx.draw_networkx_labels(G, offset_pos, labels=node_cost_labels, font_size=8, font_color='black')
@@ -108,7 +99,7 @@ def dp_tsp(n, current, mask, dp, link, currTime, G, macet, posGUI, visited_edges
         return dp[mask][current]
 
     result = sys.float_info.max
-    best_next_node = None  # Track the optimal next node
+    best_next_node = None  
 
     for i in range(n):
         val = 1 << i
@@ -123,7 +114,6 @@ def dp_tsp(n, current, mask, dp, link, currTime, G, macet, posGUI, visited_edges
 
         arrivalTime = currTime + travelTime
 
-        # Handle traffic delays (macet)
         if (current, i) in macet:
             for mulaimacet, akhirmacet, tambahanmacet in macet[(current, i)]:
                 tamb = 0.0
@@ -139,23 +129,21 @@ def dp_tsp(n, current, mask, dp, link, currTime, G, macet, posGUI, visited_edges
                 sub += tamb
                 sc.add_log(f"Additional time: {tamb}")
 
-        # Check if the current path is the best so far
+    
         if sub < result:
             result = sub
             link[mask][current]=i
-            best_next_node = i  # Track the optimal next node
+            best_next_node = i  
         
         sc.add_log(f"Visiting node {i} from {current}. Cost: {sub}")
         
-
-    # Add the optimal edge to the visited edges
     if best_next_node is not None:
         visited_edges.append((current, best_next_node))
-        plot_graph_step(G, posGUI, visited_edges, current)  # Plot only optimal edges
+        plot_graph_step(G, posGUI, visited_edges, current)  
     
     if not plt.fignum_exists(1):
         print("Window closed. Exiting...")
-        exit()  # Exit if the window is closed
+        exit()  
 
     dp[mask][current] = result
     return result
@@ -165,19 +153,19 @@ def dp_tsp(n, current, mask, dp, link, currTime, G, macet, posGUI, visited_edges
 
 def getpath(link):
     current = 0
-    mask = 1  # Start from node 0, mask initialized with 1
-    path = [0]  # Path starts at node 0
+    mask = 1  
+    path = [0]  
 
     while True:
         next_node = link[mask][current]
-        if next_node == 0:  # If we’re back at the start node, break the loop
+        if next_node == 0:  
             break
 
         path.append(next_node)
-        mask |= (1 << next_node)  # Add the next node to the mask
+        mask |= (1 << next_node)  
         current = next_node
 
-    path.append(0)  # Complete the tour by returning to the start
+    path.append(0)  
     return path
 
 
@@ -189,7 +177,7 @@ def dynamic_programming(G, n, macet, sc):
     dp = [[-1] * n for _ in range(1 << n)]
     link = [[0] * n for _ in range(1 << n)]
 
-    visited_edges = []  # Track visited edges
+    visited_edges = []  
 
     res = dp_tsp(n, 0, 1, dp, link, 0, G, macet, pos, visited_edges, sc)
 
@@ -200,9 +188,9 @@ def dynamic_programming(G, n, macet, sc):
     x = "Optimal path: " + ' -> '.join(map(str, optimal_path))
     sc.add_log(x)
 
-    plot_final_path(G, pos, optimal_path)  # Final plot
+    plot_final_path(G, pos, optimal_path)  
 
-    plt.ioff()  # Turn off interactive mode
+    plt.ioff()  
     plt.show()
 
 

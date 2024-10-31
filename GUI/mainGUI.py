@@ -217,20 +217,17 @@ class PageMain:
                     label = tk.Label(self.scrollable_frame3.scrollable_frame, text=f"{i} to {j}", font='SegoeUI 12')
                     label.grid(row=num_row, column=0, padx=10, pady=5)
 
-                    # Create entries for start time, end time, and congestion percentage
                     start_entry = tk.Entry(self.scrollable_frame3.scrollable_frame, font='SegoeUI 12', width=10)
                     end_entry = tk.Entry(self.scrollable_frame3.scrollable_frame, font='SegoeUI 12', width=10)
                     percent_entry = tk.Entry(self.scrollable_frame3.scrollable_frame, font='SegoeUI 12', width=10)
 
-                    # Place entries in consecutive columns
                     start_entry.grid(row=num_row, column=1, padx=10, pady=5)
                     end_entry.grid(row=num_row, column=2, padx=10, pady=5)
                     percent_entry.grid(row=num_row, column=3, padx=10, pady=5)
 
-                    # Store entries in a nested dictionary or list to retrieve later
                     self.ans3[i][j] = (start_entry, end_entry, percent_entry)
 
-                    num_row += 1  # Move to the next row`
+                    num_row += 1 
 
 
 
