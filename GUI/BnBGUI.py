@@ -155,7 +155,7 @@ def BNBrec(G, curr_bound, curr_weight, lvl, curr_path, N, visited, macet, res, p
                     sc.add_log(f"Additional time: {tamb}")
 
             curr_weight += G[curr_path[lvl - 1]][i]['weight'] + nextCost
-            sc.add_log(f"Visiting node {i} from {curr_path[lvl-1]}. Cost: {nextCost}")
+            sc.add_log(f"Visiting node {i} from {curr_path[lvl-1]}. Cost: {curr_weight}")
 
             if lvl == 1:
                 curr_bound -= (firstMin(G, curr_path[lvl - 1], N) + firstMin(G, i, N)) / 2

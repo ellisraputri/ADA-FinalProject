@@ -1,5 +1,6 @@
 import sys
 from collections import defaultdict
+import random
 
 graph = []
 nodeCost = []
@@ -41,6 +42,7 @@ def tsp(n, current, mask, dp, link, currTime):
                     tamb = (arrivalTime - currTime) * tambahanmacet
 
                 sub += tamb
+                print("kena macet")
 
         print(f"endcost = {sub}")
 
@@ -64,18 +66,49 @@ def getpath(link):
     return path
 
 
+def randomizeGraph(n):
+    weight_range=(1,100)
+    graph = [[0]*(n)] *(n)
+    for i in range(n):
+        for j in range(i+1, n):
+            graph[i][j] = random.randint(*weight_range) 
+            graph[j][i] = random.randint(*weight_range)
+    return graph
+
+def randomizeNodeCost(n):
+    weight_range=(1,100)
+    nodecost = [0] *(n)
+    for i in range(n):
+        nodecost[i] =random.randint(*weight_range)
+    return nodecost
+
+def randomizeCongestion(n, congestion_amount):
+    macet = defaultdict(list)
+    weight_range=(1, n*100)
+
+    for _ in range(congestion_amount):
+        i=0
+        j=0
+        while(i==j):
+            i = random.randint(0, n - 1)
+            j = random.randint(0, n - 1)
+
+        a = random.randint(*weight_range)  
+        b = random.randint(a, weight_range[1])  
+        percent = round(random.uniform(0.1, 1.0), 2)  
+        macet[(i, j)].append((a, b, percent))
+    return macet
+
+
+
 def main():
-    global nodeCost, graph
-    n = 4
-    nodeCost = [0,5,7,10]
-    graph = [
-        [0, 8, 12, 15],
-    [8, 0, 10, 20],
-    [12, 10, 0, 9],
-    [15, 20, 9, 0]
-    ]
-    macet[(0, 1)].append((2, 12, 1.0))
-    macet[(1, 3)].append((5, 15, 0.7))
+    global nodeCost, graph, macet
+    n = int(input("Enter node amount: "))
+    nodeCost = randomizeNodeCost(n)
+    graph = randomizeGraph(n)
+
+    congestion_amount = int(input("Enter congestion amount: "))
+    macet = randomizeCongestion(n, congestion_amount)
 
 
     dp = [[-1] * n for _ in range(1 << n)]

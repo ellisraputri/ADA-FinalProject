@@ -1,4 +1,5 @@
 from collections import defaultdict
+import random 
 
 def tsp(visited, currPos, n, count, currTime, ans, hasil, macet, nodeCost, graph):
     if count == n and graph[currPos][0]:
@@ -59,20 +60,49 @@ def tsp(visited, currPos, n, count, currTime, ans, hasil, macet, nodeCost, graph
 
     return optimal_path
 
-def main():
-    n = 4
-    nodeCost = [0, 15, 10, 20]
-    graph = [
-        [0, 10, 15, 20],
-    [10, 0, 35, 25],
-    [15, 35, 0, 30],
-    [20, 25, 30, 0]
-    ]
+def randomizeGraph(n):
+    weight_range=(1,100)
+    graph = [[0]*(n)] *(n)
+    for i in range(n):
+        for j in range(i+1, n):
+            graph[i][j] = random.randint(*weight_range) 
+            graph[j][i] = random.randint(*weight_range)
+    return graph
 
-    # Traffic conditions (start, end, additional cost per time unit)
+def randomizeNodeCost(n):
+    weight_range=(1,100)
+    nodecost = [0] *(n)
+    for i in range(n):
+        nodecost[i] =random.randint(*weight_range)
+    return nodecost
+
+def randomizeCongestion(n, congestion_amount):
     macet = defaultdict(list)
-    macet[(0, 2)].append((5,30,1))
-    macet[(2, 3)].append((10,50,0.8))
+    weight_range=(1, n*100)
+
+    for _ in range(congestion_amount):
+        i=0
+        j=0
+        while(i==j):
+            i = random.randint(0, n - 1)
+            j = random.randint(0, n - 1)
+
+        a = random.randint(*weight_range)  
+        b = random.randint(a, weight_range[1])  
+        percent = round(random.uniform(0.1, 1.0), 2)  
+        macet[(i, j)].append((a, b, percent))
+    return macet
+
+
+
+
+def main():
+    n = int(input("Enter node amount: "))
+    nodeCost = randomizeNodeCost(n)
+    graph = randomizeGraph(n)
+
+    congestion_amount = int(input("Enter congestion amount: "))
+    macet = randomizeCongestion(n, congestion_amount)
 
     visited = [False] * n
     visited[0] = True
