@@ -1,14 +1,14 @@
-import sys
+import random
 from collections import defaultdict
 from math import inf
 
 #time dependent tsp branch and bound :D
 
 res = inf
-N = 4
+N = 0
 path = [-1] * (N + 1)
 visited = [False] * N
-nodeCost = [0, 15, 10, 20]
+nodeCost = []
 macet = defaultdict(list)
 
 def firstMin(adj, i):
@@ -98,18 +98,55 @@ def TSP(adj):
     curr_path[0] = 0
     TSPrec(adj, curr_bound, 0, 1, curr_path)
 
+
+def randomizeGraph(n):
+    weight_range=(1,100)
+    graph = [[0]*(n)] *(n)
+    for i in range(n):
+        for j in range(i+1, n):
+            graph[i][j] = random.randint(*weight_range) 
+            graph[j][i] = random.randint(*weight_range)
+    return graph
+
+def randomizeNodeCost(n):
+    weight_range=(1,100)
+    nodecost = [0] *(n)
+    for i in range(n):
+        nodecost[i] =random.randint(*weight_range)
+    return nodecost
+
+def randomizeCongestion(n, congestion_amount):
+    macet = defaultdict(list)
+    weight_range=(1, n*100)
+
+    for _ in range(congestion_amount):
+        i=0
+        j=0
+        while(i==j):
+            i = random.randint(0, n - 1)
+            j = random.randint(0, n - 1)
+
+        a = random.randint(*weight_range)  
+        b = random.randint(a, weight_range[1])  
+        percent = round(random.uniform(0.1, 1.0), 2)  
+        macet[(i, j)].append((a, b, percent))
+    return macet
+
+
+
 def main():
-    global res
+    global res, N, macet, nodeCost, path, visited
 
-    adj = [[0, 10, 15, 20],
-[10, 0, 35, 25],
-[15, 35, 0, 30],
-[20, 25, 30, 0]]
+    N = int(input("Enter node amount: "))
+    nodeCost = randomizeNodeCost(N)
+    adj = randomizeGraph(N)
 
-    # macet[(0,2)].append((5, 30, 1.0))
-    # macet[(2,3)].append((10, 50, 0.8))
-    # macet[(2,3)].append((5, 20, 0.5))
-    # macet[(3,4)].append((12, 30, 0.6))
+    congestion_amount = int(input("Enter congestion amount: "))
+    macet = randomizeCongestion(N, congestion_amount)
+
+    path = [-1] * (N + 1)
+    visited = [False] * N
+
 
     TSP(adj)
 
