@@ -96,6 +96,18 @@ def randomizeCongestion(n, congestion_amount):
         macet[(i, j)].append((a, b, percent))
     return macet
 
+def analyze_this_code(ans):
+    optimal_path = tsp(0, 1, nodeCost[0], ans)
+
+    # take a snapshot
+    snapshot = tm.take_snapshot()
+    for stat in snapshot.statistics("lineno"):
+        print(stat)
+
+    # displaying the memory in bytes (current and peak)
+    print(tm.get_traced_memory())
+    return optimal_path
+
 
 def main():
     global n, nodeCost, graph, macet, hasil, visited
@@ -111,8 +123,10 @@ def main():
     visited[0] = True
     ans = [float('inf')]
     hasil = [0]
-    
-    optimal_path = tsp(0, 1, nodeCost[0], ans)
+
+    tm.start()
+    optimal_path = analyze_this_code(ans)
+    tm.stop()
 
     print(f"Minimum cost: {ans[0]}")
     if optimal_path:
@@ -120,6 +134,7 @@ def main():
         for i in optimal_path:
             print(i, end=" ")
         print()
+
 
 if __name__ == "__main__":
     main()

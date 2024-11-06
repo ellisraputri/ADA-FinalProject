@@ -1,3 +1,4 @@
+from datetime import datetime
 import sys
 from collections import defaultdict
 import random
@@ -123,7 +124,10 @@ def main():
     link = [[0] * n for _ in range(1 << n)]
     mask = 1  
 
+    start = datetime.now()
     result = tsp(0, dp, link, 0)
+    end = datetime.now()
+
     print("\nDP Table:")
     for row in dp:
         print(row)
@@ -131,6 +135,10 @@ def main():
     path = getpath(link)
     print(f"Minimum cost: {result}")
     print("Path:", " ".join(map(str, path)))
+
+    # display in miliseconds
+    ex_time = (end-start).total_seconds() * (10 ** 3) 
+    print(f"Execution time = {ex_time:.03f}ms")
 
 
 if __name__ == "__main__":

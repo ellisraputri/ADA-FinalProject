@@ -1,6 +1,6 @@
 from collections import defaultdict
 import random
-import tracemalloc as tm
+from datetime import datetime 
 
 n = 0
 nodeCost = []
@@ -111,8 +111,10 @@ def main():
     visited[0] = True
     ans = [float('inf')]
     hasil = [0]
-    
+
+    start = datetime.now()
     optimal_path = tsp(0, 1, nodeCost[0], ans)
+    end = datetime.now()
 
     print(f"Minimum cost: {ans[0]}")
     if optimal_path:
@@ -120,6 +122,10 @@ def main():
         for i in optimal_path:
             print(i, end=" ")
         print()
+    
+    # display in miliseconds
+    ex_time = (end-start).total_seconds() * (10 ** 3) 
+    print(f"Execution time = {ex_time:.03f}ms")
 
 if __name__ == "__main__":
     main()

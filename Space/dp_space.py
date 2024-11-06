@@ -1,3 +1,4 @@
+import tracemalloc as tm
 import sys
 from collections import defaultdict
 import random
@@ -25,7 +26,7 @@ def tsp(current, dp, link, currTime):
         if mask & val:
             continue
 
-        print(f"current {current}, i {i}")
+        # print(f"current {current}, i {i}")
         travelTime = graph[current][i]
         
         prev_mask = mask
@@ -34,7 +35,7 @@ def tsp(current, dp, link, currTime):
         mask = prev_mask
 
         arrivalTime = currTime + travelTime
-        print(f"current {current}, i {i} = {sub}")
+        # print(f"current {current}, i {i} = {sub}")
 
         if (current, i) in macet:
             for mulaimacet, akhirmacet, tambahanmacet in macet[(current, i)]:
@@ -49,16 +50,16 @@ def tsp(current, dp, link, currTime):
                     tamb = (arrivalTime - currTime) * tambahanmacet
 
                 sub += tamb
-                print("kena macet")
+                # print("kena macet")
 
-        print(f"endcost = {sub}")
+        # print(f"endcost = {sub}")
 
         if sub < local_result:
             local_result = sub
             link[mask][current] = i  
 
     dp[mask][current] = local_result
-    print(f"\nresult {local_result}")
+    # print(f"\nresult {local_result}")
     return local_result
 
 
@@ -108,6 +109,17 @@ def randomizeCongestion(n, congestion_amount):
         macet[(i, j)].append((a, b, percent))
     return macet
 
+def analyze_this_code(dp, link):
+    result = tsp(0, dp, link, 0)
+
+    # take a snapshot
+    snapshot = tm.take_snapshot()
+    for stat in snapshot.statistics("lineno"):
+        print(stat)
+
+    # displaying the memory in bytes (current and peak)
+    print(tm.get_traced_memory())
+    return result
 
 def main():
     global n, result, graph, nodeCost, macet, mask
@@ -123,10 +135,13 @@ def main():
     link = [[0] * n for _ in range(1 << n)]
     mask = 1  
 
-    result = tsp(0, dp, link, 0)
-    print("\nDP Table:")
-    for row in dp:
-        print(row)
+    tm.start()
+    result = analyze_this_code(dp, link)
+    tm.stop()
+    
+    # print("\nDP Table:")
+    # for row in dp:
+    #     print(row)
     
     path = getpath(link)
     print(f"Minimum cost: {result}")
