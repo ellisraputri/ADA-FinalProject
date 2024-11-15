@@ -2,6 +2,7 @@ import random
 from collections import defaultdict
 from math import inf
 from datetime import datetime
+from time import perf_counter
 
 #time dependent tsp branch and bound
 
@@ -148,16 +149,16 @@ def main():
     path = [-1] * (N + 1)
     visited = [False] * N
 
-    start = datetime.now()
-    TSP()
-    end = datetime.now()
+    start = perf_counter()
+    TSP() 
+    end = perf_counter()
 
     print(f"Minimum cost: {res}")
     print(f"Path: {'-'.join(map(str, path))}")
 
-    # display in miliseconds
-    ex_time = (end-start).total_seconds() * (10 ** 3) 
-    print(f"Execution time = {ex_time:.03f}ms")
+    ex_time = (end - start) * 1000  
+    print(f"Execution time = {ex_time:.03f} ms")
 
+    
 if __name__ == "__main__":
     main()
