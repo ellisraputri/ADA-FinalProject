@@ -9,81 +9,75 @@
 - Ellis Raputri (2702298116)
 
 
-**All Documentations:** [Click here]()
+**All Documentations:** [Click here](https://github.com/ellisraputri/ADA-FinalProject/tree/main/Documentation)
 
-**Benchmark Process (Time):** [Click here](https://github.com/Ella-Raputri/DSA-FinalProject)
+**Benchmark Process (Time):** [Click here](https://github.com/ellisraputri/ADA-FinalProject/tree/main/Time)
 
-**Benchmark Process (Space):** [Click here](https://github.com/Ella-Raputri/DSA-FinalProject)
+**Benchmark Process (Space):** [Click here](https://github.com/ellisraputri/ADA-FinalProject/tree/main/Space)
 
 <br>
 
 ## Project Description
-Quiz Pro is the GUI implementation after we obtain the best data structure for making a quiz management system, which is Linked List. Quiz Pro can be used by two kinds of user, teachers and students. Teachers can add, delete, and edit quiz. Teachers can also add, delete, edit, change order, and search questions in a quiz. Lastly, teachers can also view the students result. As for student, student can take the quiz and view their results. 
+In this project, we aim to provide a solution to time-dependent travel salesman problem (TD-TSP). In the classical TSP, the time window is constant, which can lead to an inaccurate calculation. In TD-TSP, the time windows aren’t constant and will vary throughout the day. We aim to analyse the effect of travel times on the TSP problem and we hope to provide a more realistic solution to the TSP problem that reflects on real-world traffic conditions.
 
 <br>
 
-## Contents
+## Files
+- 'Documenation' folder: all documentations (project report)
+- 'GUI' folder: GUI of the project
+- 'Original_Version': the classical TSP brute force implementation
+- 'Space' folder: the benchmarking for space complexity
+- 'Statistics' folder: the statistic calculation of the benchmarking result
+- 'Time' folder: the benchmarking for time complexity
+- 'backtracking.py': brute force method for our TD-TSP problem
+- 'dp.py': dynamic programming approach for our TD-TSP problem
+- 'tdbnb.py': branch-and-bound approach for our TD-TSP problem
+
+## Screenshots
 <details>
-<summary>&ensp;<b>Welcome Page</b></summary>
+<summary>&ensp;<b>Home Page</b></summary>
 
-- The Welcome Page is a landing page for users when accessing Quiz Pro. 
+- Contains all fields that need to be filled in to run the visualizer.
 
-- User can also do login or sign up in here. 
-
-- Here are some images of this page:
-
-  <img src="readImages/WelcomePage1.png" alt ="Welcome Page Image (1)" width = "600"><br>
-
-  <img src="readImages/WelcomePage2.png" alt="Welcome Page Image (2)" width = "600"><br>
-
-  <img src="readImages/WelcomePage3.png" alt="Welcome Page Image (3)" width = "600">
+  <img src="Documentation/image/home.png" alt ="Home Page Image" width = "600"><br>
 
 <br>
 </details>
 
 <details>
-<summary>&ensp;<b>Admin Page</b></summary>
+<summary>&ensp;<b>Manual Input</b></summary>
 
-- Admin Page enables admins or teachers to manage quizzes and questions.
+- If you choose manual input for the graph, node cost, or congestion, it will show the images below.
 
-- What you can do here:
-    - Add, edit, and delete quiz 
-    - Add, edit, delete, change order, and search questions.
-    - View students results.
+- Manual input for graph
 
-- Here are some images of this page:
+  <img src="Documentation/image/graph_manual.png" alt ="Graph Manual Input Image" width = "300"><br>
 
-  <img src="readImages/AdminPage1.png" alt ="Admin Page Image (1)" width = "600"><br>
+- Manual input for node cost
 
-  <img src="readImages/AdminPage2.png" alt="Admin Page Image (2)" width = "600">
+  <img src="Documentation/image/nodecost_manual.png" alt ="Node Cost Manual Input Image" width = "300"><br>
+
+- Manual input for congestion
+
+  <img src="Documentation/image/congestion_manual.png" alt ="Congestion Manual Input Image" width = "300"><br>
 
 <br>
 </details>
 
 <details>
-<summary>&ensp;<b>Student Page</b></summary>
+<summary>&ensp;<b>Result</b></summary>
 
-- Student Page helps students to take quizzes and view their scores after the quiz.
+- After all of the parameters are filled, the visualizer will work by performing the algorithm step-by-step.
 
-- Here are some images of this page:
+- The summary in the right summarizes all the graph weight, node cost, and congestion that is generated randomly or based on the user input.
 
-  <img src="readImages/StudentPage1.png" alt ="Student Page Image (1)" width = "600"><br>
+- The output in the right summarizes what the visualizer is doing right now. Lastly, it will also display the minimum cost and optimal path.
 
-  <img src="readImages/StudentPage2.png" alt="Student Page Image (2)" width = "600"><br>
-
-  <img src="readImages/StudentPage3.png" alt="Student Page Image (3)" width = "600"><br>
-
-  <img src="readImages/StudentPage4.png" alt="Student Page Image (4)" width = "600">
+  <img src="Documentation/image/result.png" alt ="Result Home Page Image" width = "600"><br>
 
 <br>
 </details>
 
+
 <br>
 
-
-## Contact Information
-
-If you have any questions or feedback, please kindly contact us:
-- Instagram: [Click here](https://instagram.com/raputriella?igshid=OGQ5ZDc2ODk2ZA==)
-- Whatsapp: [Click here](https://wa.me/62895629504490)
-- Phone number: +62895629504490
