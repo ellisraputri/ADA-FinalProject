@@ -35,7 +35,7 @@ In this project, we aim to provide a solution to time-dependent travel salesman 
 
 <br>
 
-## Screenshots
+## GUI Screenshots
 <details>
 <summary>&ensp;<b>Home Page</b></summary>
 
