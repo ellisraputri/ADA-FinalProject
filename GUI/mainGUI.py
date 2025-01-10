@@ -204,7 +204,7 @@ class PageMain:
             self.okbutton.pack(padx=200, pady=30)
             self.okbutton.configure(font="SegoeUI 14 bold", background='gray', foreground='white')
 
-            headers = ["Node", "Start Time", "End Time", "Congestion (%)"]
+            headers = ["Node", "Start Time", "End Time", "Congestion"]
             for col, header in enumerate(headers):
                 header_label = tk.Label(self.scrollable_frame3.scrollable_frame, text=header, font='SegoeUI 14 bold')
                 header_label.grid(row=0, column=col, padx=10, pady=5)
