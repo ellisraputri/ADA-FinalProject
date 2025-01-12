@@ -33,7 +33,9 @@ In this project, we aim to provide a solution to time-dependent travel salesman 
 - 'dp.py': dynamic programming approach for our TD-TSP problem
 - 'tdbnb.py': branch-and-bound approach for our TD-TSP problem
 
-## Screenshots
+<br>
+
+## GUI Screenshots
 <details>
 <summary>&ensp;<b>Home Page</b></summary>
 
